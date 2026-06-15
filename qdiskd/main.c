@@ -175,10 +175,10 @@ int main(void)
 
 	qb_log_init("tbdisk", LOG_DAEMON, log_level);
 
-	qb_log_filter_ctl(TAGS_MAIN, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "engine/main.c", LOG_TRACE);
-	qb_log_filter_ctl(TAGS_ALGORITHM, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "engine/algorithm.c", LOG_TRACE);
-	qb_log_filter_ctl(TAGS_MISC, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "engine/vquorum.c", LOG_TRACE);
-	qb_log_filter_ctl(TAGS_MISC, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "engine/cmap.c", LOG_TRACE);
+	qb_log_filter_ctl(TAGS_MAIN, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "qdiskd/main.c", LOG_TRACE);
+	qb_log_filter_ctl(TAGS_ALGORITHM, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "qdiskd/algorithm.c", LOG_TRACE);
+	qb_log_filter_ctl(TAGS_MISC, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "qdiskd/vquorum.c", LOG_TRACE);
+	qb_log_filter_ctl(TAGS_MISC, QB_LOG_TAG_SET, QB_LOG_FILTER_FILE, "qdiskd/cmap.c", LOG_TRACE);
 
 	qb_log_tags_stringify_fn_set(qdisk_log_tag_to_string); // setup the callback to print custom tags
 	/*set the logging format of the syslog messages.  Note that SYSLOG logging is enabled by default.*/

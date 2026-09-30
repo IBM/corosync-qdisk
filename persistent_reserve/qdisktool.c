@@ -86,6 +86,59 @@ int main(int argc, const char *argv[])
 	}
 
 	if(strcmp(argv[1], "check") == 0) {
+		pr_dev_err err = PR_ERR_OK;
+		uint64_t ikey = 0x7E570000;
+		handle = persistent_reserve_device_new_key(argv[2], ikey);
+
+		size_t num_keys = 0;
+		uint64_t *keys = NULL;
+		err = persistent_reserve_device_get_registered_keys(handle, &num_keys, &keys);
+		if(err != PR_ERR_OK) {
+			printf("Failed to read keys from device %s\n", argv[2]);
+			return 1;
+		}
+
+		if(num_keys != 0) {
+			printf("Warning: device %s already has %zu keys registered, it may be in use\n", argv[2], num_keys);
+		}
+
+		for(size_t i=0; i < num_keys; i++) {
+			if(keys[i] == ikey) {
+				printf("Error: device %s already has test key %" PERSISTENT_RESERVE_PRI_KEY " registered\n", argv[2], ikey);
+				return 1;
+			}
+		}
+
+		err = persistent_reserve_device_register_key(handle);
+		if(err != PR_ERR_OK) {
+			printf("Failed to register test key %" PERSISTENT_RESERVE_PRI_KEY " with device %s\n", ikey, argv[2]);
+			return 1;
+		}
+
+		err = persistent_reserve_device_get_registered_keys(handle, &num_keys, &keys);
+		if(err != PR_ERR_OK) {
+			printf("Failed to read keys from device %s\n", argv[2]);
+			err = persistent_reserve_device_unregister_key(handle);
+			if(err != PR_ERR_OK) {
+				printf("Failed to un-register test key %" PERSISTENT_RESERVE_PRI_KEY " from device %s\n", ikey, argv[2]);
+			}
+			return 1;
+		}
+
+		bool found_test_key = false;
+		for(size_t i=0; i < num_keys; i++) {
+			found_test_key = found_test_key || (keys[i] == ikey);
+		}
+		if(!found_test_key) {
+			printf("Test key %" PERSISTENT_RESERVE_PRI_KEY " not listed by device %s after registration\n", ikey, argv[2]);
+		}
+
+		err = persistent_reserve_device_register_key(handle);
+		if(err != PR_ERR_OK) {
+			printf("Failed to un-register test key %" PERSISTENT_RESERVE_PRI_KEY " from device %s\n", ikey, argv[2]);
+			return 1;
+		}
+
 		printf("Device %s is usable\n", argv[2]);
 		return 0;
 	}

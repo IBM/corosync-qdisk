@@ -4,7 +4,7 @@
 # bootstrap / init
 AC_PREREQ([2.71])
 
-AC_INIT([corosync-qdisk],[1.0],[users@clusterlabs.org])
+AC_INIT([corosync-qdisk],[1.0.1],[users@clusterlabs.org])
 
 AC_USE_SYSTEM_EXTENSIONS
 

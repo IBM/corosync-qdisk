@@ -324,6 +324,13 @@ void algorithm_run(void)
 		if(is_quorate) {
 			ENGN_LOG(LOG_NOTICE, "Cluster Quorate, ready to serve");
 			state = IDLE;
+		} else if(node_count == 1 && num_nodes_visible == 1) {
+			/* Special case: single-node cluster. The node cannot reach quorum
+			 * until qdisk provides its vote, creating a deadlock. Cast the
+			 * vote now while still in START so corosync can become quorate,
+			 * and we will transition to IDLE on the next heartbeat once quorate. */
+			ENGN_LOG(LOG_NOTICE, "Single-node cluster detected, providing vote to bootstrap quorum");
+			cast_vote = 1;
 		}
 		break;
 

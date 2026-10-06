@@ -72,7 +72,7 @@ cs_error_t qdisk_cmap_get_corosync_logfile(char** path);
 cs_error_t qdisk_cmap_dispatch_all(void);
 cs_error_t qdisk_cmap_get_fd(int *fd);
 
-cs_error_t qdisk_cmap_add_reload_notify();
+cs_error_t qdisk_cmap_add_reload_notify(void);
 
 #ifdef __cplusplus
 }

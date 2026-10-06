@@ -523,13 +523,13 @@ err:
 
 static bool is_multipath(const char *device_path)
 {
-	char cmd[CMD_LENGTH + 1] = { 0 };
+	char cmd[CMD_LENGTH + PATH_MAX + 1] = { 0 };
 	char real_dev_path[PATH_MAX];
 	if(!realpath(device_path, real_dev_path)) {
 		pr_log(LOG_CRIT, "Realpath of device too long!");
 		abort();
 	}
-	snprintf(cmd, CMD_LENGTH, "multipath -v1 -C %s  2>&1", real_dev_path);
+	snprintf(cmd, CMD_LENGTH + PATH_MAX, "multipath -v1 -C %s  2>&1", real_dev_path);
 
 	// assume if we can't run it not multipath, that is if the multipath tools aren't available it's OK for this to just fail
 	return exec_cmd(cmd) == 0;

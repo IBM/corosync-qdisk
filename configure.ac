@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # bootstrap / init
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 
 AC_INIT([corosync-qdisk],[1.0.1],[users@clusterlabs.org])
 

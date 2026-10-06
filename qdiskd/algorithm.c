@@ -54,7 +54,7 @@ static struct persistent_reserve_device *pr_device = NULL;
 static uint32_t algorithm_heartbeat = 0;
 static uint32_t algorithm_timeout = 0;
 
-static enum state { START, IDLE, RESERVE_DISK, RECV_VOTE, HAVE_QDISK, RELEASE_QDISK, RESIGNED, QDISK_NUM_STATES_ } state = START;
+static enum state { START, SINGLE_NODE, IDLE, RESERVE_DISK, RECV_VOTE, HAVE_QDISK, RELEASE_QDISK, RESIGNED, QDISK_NUM_STATES_ } state = START;
 
 pr_dev_err algorithm_init(void)
 {
@@ -331,8 +331,16 @@ void algorithm_run(void)
 			 * and we will transition to IDLE on the next heartbeat once quorate. */
 			ENGN_LOG(LOG_NOTICE, "Single-node cluster detected, providing vote to bootstrap quorum");
 			cast_vote = 1;
+            state = SINGLE_NODE;
 		}
 		break;
+
+    case SINGLE_NODE:
+        cast_vote = 1;
+        if(node_count >= 1) {
+            state = IDLE;
+        }
+        break;
 
 	case IDLE:
 		cast_vote = 1;
@@ -353,6 +361,9 @@ void algorithm_run(void)
 		} else if(num_nodes_visible*2 < node_count) {
 			cast_vote = 0;
 			state = RESIGNED;
+		} else if( 1 >= node_count ) {
+			cast_vote = 1;
+			state = SINGLE_NODE;
 		} else {
 			timeout_time = gettime_ms() + algorithm_timeout;
 		}

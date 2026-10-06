@@ -78,7 +78,7 @@ static pr_dev_err generate_reserve_key(const char *key_path, uint64_t *ikey)
 	if(!file) {
 		const char *err = strerror(errno);
 		pr_log(LOG_ERR, "Failed to write key to file %s (%s)\n", key_path, err);
-		return PR_ERR_DEVICE_CANT_OPEN_KEYFILE;
+		return PR_ERR_DEVICE_CANT_READ_KEYFILE;
 	}
 
 	char hostname[_POSIX_HOST_NAME_MAX+1] = { 0 };

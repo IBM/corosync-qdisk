@@ -337,14 +337,17 @@ void algorithm_run(void)
 
     case SINGLE_NODE:
         cast_vote = 1;
-        if(node_count >= 1) {
+        if(node_count > 1) {
             state = IDLE;
         }
         break;
 
 	case IDLE:
 		cast_vote = 1;
-		if(tiebreak_needed) {
+		if( 1== node_count ) {
+			cast_vote = 1;
+			state = SINGLE_NODE;
+        } else if(tiebreak_needed) {
 			if(resv_node_visible) {
 				timeout_time = gettime_ms() + algorithm_timeout;
 				state = RECV_VOTE;
@@ -361,9 +364,6 @@ void algorithm_run(void)
 		} else if(num_nodes_visible*2 < node_count) {
 			cast_vote = 0;
 			state = RESIGNED;
-		} else if( 1 >= node_count ) {
-			cast_vote = 1;
-			state = SINGLE_NODE;
 		} else {
 			timeout_time = gettime_ms() + algorithm_timeout;
 		}

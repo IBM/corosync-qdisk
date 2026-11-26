@@ -97,16 +97,17 @@ struct persistent_reserve_device *persistent_reserve_device_new(const char *devi
 	FILE *keyfile = NULL;
 	uint64_t ikey = 0;
 
-	if(access(key_path, F_OK) != 0) {
-		pr_log(LOG_NOTICE, "Generating key\n");
-		generate_reserve_key(key_path, &ikey);
-	} else {
-		keyfile = fopen(key_path, "r");
-		if(!keyfile) {
+	keyfile = fopen(key_path, "r");
+	if(!keyfile) {
+		if(errno == ENOENT) {
+			pr_log(LOG_NOTICE, "Generating key\n");
+			generate_reserve_key(key_path, &ikey);
+		} else {
 			const char *errstr = strerror(errno);
 			pr_log(LOG_ERR, "Failed to read key from file %s (%s)\n", key_path, errstr);
 			return NULL;
 		}
+	} else {
 		int res = fscanf(keyfile, "%" PERSISTENT_RESERVE_PRI_KEY, &ikey);
 		fclose(keyfile);
 		if(res == EOF) {

@@ -57,7 +57,7 @@
 #define NANOSECOND_PER_MS UINT64_C(1000000)
 
 // Default
-static char *corosync_logfile_path = "/var/log/cluster/corosync.log";
+static const char *corosync_logfile_path = "/var/log/cluster/corosync.log";
 
 static void timer_cb(void *data)
 {

@@ -54,7 +54,7 @@ static struct persistent_reserve_device *pr_device = NULL;
 static uint32_t algorithm_heartbeat = 0;
 static uint32_t algorithm_timeout = 0;
 
-static enum state { START, IDLE, RESERVE_DISK, RECV_VOTE, HAVE_QDISK, RELEASE_QDISK, RESIGNED, QDISK_NUM_STATES_ } state = START;
+static enum state { START, SINGLE_NODE, IDLE, RESERVE_DISK, RECV_VOTE, HAVE_QDISK, RELEASE_QDISK, RESIGNED, QDISK_NUM_STATES_ } state = START;
 
 pr_dev_err algorithm_init(void)
 {
@@ -324,12 +324,30 @@ void algorithm_run(void)
 		if(is_quorate) {
 			ENGN_LOG(LOG_NOTICE, "Cluster Quorate, ready to serve");
 			state = IDLE;
+		} else if(node_count == 1 && num_nodes_visible == 1) {
+			/* Special case: single-node cluster. The node cannot reach quorum
+			 * until qdisk provides its vote, creating a deadlock. Cast the
+			 * vote now while still in START so corosync can become quorate,
+			 * and we will transition to IDLE on the next heartbeat once quorate. */
+			ENGN_LOG(LOG_NOTICE, "Single-node cluster detected, providing vote to bootstrap quorum");
+			cast_vote = 1;
+            state = SINGLE_NODE;
 		}
 		break;
 
+    case SINGLE_NODE:
+        cast_vote = 1;
+        if(node_count > 1) {
+            state = IDLE;
+        }
+        break;
+
 	case IDLE:
 		cast_vote = 1;
-		if(tiebreak_needed) {
+		if( 1== node_count ) {
+			cast_vote = 1;
+			state = SINGLE_NODE;
+        } else if(tiebreak_needed) {
 			if(resv_node_visible) {
 				timeout_time = gettime_ms() + algorithm_timeout;
 				state = RECV_VOTE;
